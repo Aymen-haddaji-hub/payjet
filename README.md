@@ -1,17 +1,26 @@
-# PayJet (TON SaaS Wallet)
+# payjet
 
-> B2B SaaS toolkit to accept Jetton subscriptions and stream payroll inside Telegram.
+## Project structure
 
-## Architecture
-- [V1: Checkout & Stream](docs/architecture.md)
-- [V2: Off-ramp & Compliance](docs/roadmap.md)
+-   `contracts` - source code of all the smart contracts of the project and their dependencies.
+-   `wrappers` - wrapper classes (implementing `Contract` from ton-core) for the contracts, including any [de]serialization primitives and compilation functions.
+-   `tests` - tests for the contracts.
+-   `scripts` - scripts used by the project, mainly the deployment scripts.
 
-## Quickstart
-```bash
-git clone https://github.com/YOUR_USERNAME/payjet.git
-cd payjet && make setup
-```
+## How to use
 
-## Contracts
-- Jetton minter
-- Sablier stream
+### Build
+
+`npx blueprint build` or `yarn blueprint build`
+
+### Test
+
+`npx blueprint test` or `yarn blueprint test`
+
+### Deploy or run another script
+
+`npx blueprint run` or `yarn blueprint run`
+
+### Add a new contract
+
+`npx blueprint create ContractName` or `yarn blueprint create ContractName`

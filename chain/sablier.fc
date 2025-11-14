@@ -1,0 +1,67 @@
+pragma func 1.0.0;
+
+program sablier {
+    // Stream by-second (ERC-1620-like)
+    struct Stream {
+        int recipient;
+        uint64 start;
+        uint64 end;
+        int rate;
+    }
+
+    static int owner;
+    cell streams;
+
+    // Deploy
+    function deploy() {
+        owner = msgsender();
+        streams = null;
+    }
+
+    // Create a stream
+    function create_stream(int recipient, uint64 start, uint64 end, int rate) {
+        require(owner == msgsender(), 100); // Only owner can create stream
+
+        streams = write_cell(
+            streams,
+            begin_cell()
+                .store_uint(recipient, 256)
+                .store_uint(start, 64)
+                .store_uint(end, 64)
+                .store_uint(rate, 256)
+                .end_cell()
+        );
+    }
+
+    // Withdraw funds from a stream
+    function withdraw(uint64 stream_id, int amount) {
+        var stream = get_stream(stream_id);
+        require(stream.recipient == msgsender(), 101);
+
+        var elapsed = min(uint64(now), stream.end) - stream.start;
+        var owed = elapsed * stream.rate;
+        require(amount <= owed, 102);
+
+        transfer(msgsender(), amount, 0);
+        update_stream(stream_id, owed - amount);
+    }
+
+    // Get stream details
+    function get_stream(uint64 stream_id) returns (Stream) {
+        var streams_cell = read_cell(streams);
+        // Simple iteration for demo; optimize later
+        for (var i = 0; i < streams_cell.refs; i++) {
+            var stream_cell = read_ref(streams_cell, i);
+            var stream = begin_cell().load(stream_cell);
+            if (stream_id == i) {
+                return stream;
+            }
+        }
+        return (0, 0, 0, 0);
+    }
+
+    // Update stream balance
+    function update_stream(uint64 stream_id, int remaining) {
+        // Implementation will go here
+    }
+}
